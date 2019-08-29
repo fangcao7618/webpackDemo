@@ -49,3 +49,7 @@
 
     -   如何将库暴露出去？
         ![](./document/1567069185911.jpg)
+
+    ```bash
+    sudo npm i webpack webpack-cli -D --unsafe-perm
+    ```
