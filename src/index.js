@@ -1,6 +1,6 @@
 export default function add(a, b) {
-    const i = a.length - 1;
-    const j = b.length - 1;
+    let i = a.length - 1;
+    let j = b.length - 1;
 
     let carry = 0;
     let ret = "";
@@ -13,10 +13,28 @@ export default function add(a, b) {
             i--;
         }
         if (j >= 0) {
-            x = a[j] - "0";
+            y = b[j] - "0";
             j--;
         }
-
+        console.log(x, y, carry);
         sum = x + y + carry;
+
+        if (sum >= 10) {
+            carry = 1;
+            sum -= 10;
+        } else {
+            carry = 0;
+        }
+        // 0+''
+        ret = sum + ret;
     }
+
+    if (carry) {
+        ret = carry + ret;
+    }
+    return ret;
 }
+
+// add('1','999')
+// add('123','321')
+// add('999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999','1')

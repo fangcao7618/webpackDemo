@@ -1,5 +1,5 @@
 {
-    "name": "large-number-wfc",
+    "name": "study_webpack",
     "version": "1.0.0",
     "description": "【webpack 打包库和组件】大整数加法打包",
     "main": "index.js",
@@ -10,11 +10,15 @@
     },
     "repository": {
         "type": "git",
-        "url": ""
+        "url": "git+https://github.com/fangcao7618/webpackDeom.git"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/fangcao7618/webpackDeom/issues"
+    },
+    "homepage": "https://github.com/fangcao7618/webpackDeom#readme",
     "devDependencies": {
         "terser-webpack-plugin": "^1.4.1",
         "webpack": "^4.39.3",
