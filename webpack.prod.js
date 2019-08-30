@@ -177,7 +177,19 @@ module.exports = {
         //     ]
         // })
         // new webpack.optimize.ModuleConcatenationPlugin(), //当mode为production时，这个去掉
-        new FriendlyErrorsWebpackPlugin()
+        new FriendlyErrorsWebpackPlugin(),
+        function() {
+            this.hooks.done.tap("done", stats => {
+                if (
+                    stats.compilation.errors &&
+                    stats.compilation.errors.length &&
+                    process.argv.indexOf("--watch") == -1
+                ) {
+                    console.log("build error");
+                    process.exit(1);
+                }
+            });
+        }
     ].concat(htmlWebpackPlugins),
     // optimization: {
     //     splitChunks: {

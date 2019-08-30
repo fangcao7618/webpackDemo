@@ -705,3 +705,42 @@
     // 构建后，可以输入这个
     echo $?
     ```
+
+    -   如何主动捕获并处理构建错误？
+
+        compiler 在每次构建结束后会触发`done`这个`hook`
+
+        process.exit 主动处理构建报错
+
+        ```javascript
+        plugins: [
+            ...
+            new FriendlyErrorsWebpackPlugin(),
+            // 这是webpack4的写法
+            function() {
+                this.hooks.done.tap("done", stats => {
+                    if (
+                        stats.compilation.errors &&
+                        stats.compilation.errors.length &&
+                        process.argv.indexOf("--watch") == -1
+                    ) {
+                        console.log("build error");
+                        process.exit(1);
+                    }
+                });
+            }
+            // 这是webpack3的写法
+            function() {
+                this.plugin("done", stats => {
+                    if (
+                        stats.compilation.errors &&
+                        stats.compilation.errors.length &&
+                        process.argv.indexOf("--watch") == -1
+                    ) {
+                        console.log("build error");
+                        process.exit(1);
+                    }
+                });
+            }
+        ];
+        ```
