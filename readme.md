@@ -559,3 +559,149 @@
     -   客户端
 
         打包出针对服务端的组件
+
+    过程：
+
+    1.建立`webpack.ssr.js`
+
+    2.在`package.json`加一个`build:ssr`
+
+    ```json
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "webpack",
+        "probuild": "webpack --config webpack.prod.js",
+        "watch": "webpack --watch",
+        "dev": "webpack-dev-server --config webpack.dev.js --open",
+        "build:ssr": "webpack --config webpack.ssr.js"
+    },
+    ```
+
+    3.建立`server/index.js`
+
+    4.安装
+
+    ```bash
+    npm i express -D
+    ```
+
+    5.建立 `src/search/index-server.js`
+
+    6.开启服务器前，先打包`yarn build:ssr`,后开启`node server/index.js`，运行看到了 ssr 后的效果
+
+    webpack ssr 打包村子的问题
+
+    -   浏览器的全局变量(Node.js 中没有 `document`,`window`)
+
+        -   组件适配：将不兼容的组件根据打包环境进行适配
+        -   请求适配：将 fetch 或者 ajax 发送请求的写法改成 `isomorphic-fetch` 或者 `axios`
+
+    -   样式问题（Node.js 无法解析 css）
+
+        -   方案一：服务端打包通过 `ignore-loader` 忽略掉 css 的解析
+        -   方案二：将 `style-loader` 替换成 `isomorphic-style-loader`
+
+-   如何解决样式不显示的问题？
+
+    -   使用打包出来的浏览器端 html 为模块
+
+    -   设置占位符，动态插入组件
+
+    ```javascript
+    // src/search/index.html
+    <!--HTML_PLACEHOLDER-->
+    ```
+
+    ```javascript
+    // server/index.js
+    return template.replace("<!--HTML_PLACEHOLDER-->", str);
+    ```
+
+-   首屏数据如何处理？
+
+    -   服务端获取数据
+    -   替换占位符
+
+    ```javascript
+    const renderMarkup = str => {
+        const dataStr = JSON.stringify(data);
+        return template
+            .replace("<!--HTML_PLACEHOLDER-->", str)
+            .replace(
+                "<!--INITIAL_DATA_PLACEHOLDER-->",
+                `<script>window.__initial_data=${dataStr}</script>`
+            );
+    };
+    server(process.env.PORT || 3000);
+    ```
+
+    ```html
+    <!DOCTYPE html>
+    <html lang="en">
+        <head>
+            ${require('raw-loader!./meta.html')}
+            <title>Document</title>
+            <script type="text/javascript">
+                ${require('raw-loader!babel-loader!../../node_modules/lib-flexible/flexible.js')}
+            </script>
+        </head>
+        <body>
+            <div id="root"><!--HTML_PLACEHOLDER--></div>
+
+            <script
+                crossorigin
+                src="https://unpkg.com/react@16.9.0/umd/react.production.min.js"
+            ></script>
+            <script
+                crossorigin
+                src="https://unpkg.com/react-dom@16.9.0/umd/react-dom.production.min.js"
+            ></script>
+            <!--INITIAL_DATA_PLACEHOLDER-->
+        </body>
+    </html>
+    ```
+
+-   统计信息 status
+
+    ![](./document/1567154502023.jpg)
+
+-   如何优化命令行的构建日志
+
+    -   使用`friendly-errors-webpack-plugin`
+
+        -   success:构建成功的日志提示
+        -   warning:构建警告的日志提示
+        -   error:构建报错的日志提示
+
+    -   stats 设置成 errors-only
+
+    ```bash
+    sudo npm i -D friendly-errors-webpack-plugin
+    ```
+
+    ```javascript
+    // webpack.pro.js  webpack.dev.js
+    const FriendlyErrorsWebpackPlugin = require("friendly-errors-webpack-plugin");
+    plugins: [
+        ...
+        // new webpack.optimize.ModuleConcatenationPlugin(), //当mode为production时，这个去掉
+        new FriendlyErrorsWebpackPlugin()
+    ].concat(htmlWebpackPlugins),
+    ```
+
+-   构建异常和中断处理
+
+    -   在 CI/CD 的 pipline 或者发布系统需要知道当前构建状态
+    -   每次构建完成后输入 echo \$? 获取错误码
+
+    webpack4 之前的版本构建失败不会抛出错误码(error code)
+
+    Node.js 中的 process.exit 规范
+
+    -   0 表示成功完成，回调函数中，err 为 null
+    -   非 0 表示执行失败，回调函数中，err 不为 null,err.code 就是传给 exit 的数字
+
+    ```bash
+    // 构建后，可以输入这个
+    echo $?
+    ```

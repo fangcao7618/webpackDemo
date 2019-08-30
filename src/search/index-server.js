@@ -1,18 +1,12 @@
 "use strict";
 
-import React from "react";
-import ReactDOM from "react-dom";
-import largeNumber from "large-number-wfc";
-import "../../common";
-import Cat from "./images/cat.svg";
-import Fei from "./images/fei.png";
-import Svgg from "./images/svgg.svg";
-import { a } from "./tree-shaking";
-import "./search.less";
-
-// if (false) {
-//     a();
-// }
+const React = require("react");
+const largeNumber = require("large-number-wfc");
+const Cat = require("./images/cat.svg");
+const Fei = require("./images/fei.png");
+const Svgg = require("./images/svgg.svg");
+const { a } = require("./tree-shaking");
+require("./search.less");
 
 class Search extends React.Component {
     constructor() {
@@ -22,7 +16,9 @@ class Search extends React.Component {
         };
     }
     loadComponent() {
+        console.log("ggggggggggg");
         import("./text.js").then(Text => {
+            console.log(Text);
             this.setState({
                 Text: Text.default
             });
@@ -36,7 +32,7 @@ class Search extends React.Component {
             <React.Fragment>
                 <div className="search-text">
                     {funcA}
-                    <br></br>搜索文字的内容:WFC,汉体书写 九<br></br>
+                    <br></br>搜索文字的内容<br></br>
                 </div>
                 {Text ? <Text /> : null}
                 {addResult}
@@ -51,4 +47,4 @@ class Search extends React.Component {
         );
     }
 }
-ReactDOM.render(<Search />, document.getElementById("root"));
+module.exports = <Search />;

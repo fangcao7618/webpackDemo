@@ -11,7 +11,6 @@ const OptimizeCssAssetsWebpackPlugin = require("optimize-css-assets-webpack-plug
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const HtmlWebpackExternalsPlugin = require("html-webpack-externals-plugin");
-const FriendlyErrorsWebpackPlugin = require("friendly-errors-webpack-plugin");
 
 /**
  * 动态的获取entry
@@ -20,32 +19,40 @@ const setMPA = () => {
     const entry = {};
     const htmlWebpackPlugins = [];
 
-    const entryFiles = glob.sync(path.join(__dirname, "./src/*/index.js"));
+    const entryFiles = glob.sync(
+        path.join(__dirname, "./src/*/index-server.js")
+    );
     Object.keys(entryFiles).map(index => {
         const entryFile = entryFiles[index];
         //'/Users/fangcao/Documents/study/study_webpack/src/index/index.js'
-        const match = entryFile.match(/src\/(.*)\/index\.js/);
+        const match = entryFile.match(/src\/(.*)\/index-server\.js/);
 
         const pageName = match && match[1];
-        entry[pageName] = entryFile;
 
-        htmlWebpackPlugins.push(
-            new HtmlWebpackPlugin({
-                template: path.join(__dirname, `src/${pageName}/index.html`),
-                filename: `${pageName}.html`,
-                // chunks: ["vendors", pageName],
-                chunks: ["commons", pageName],
-                inject: true,
-                minify: {
-                    html5: true,
-                    collapseWhitespace: true,
-                    preserveLineBreaks: false,
-                    minifyCSS: true,
-                    minifyJS: true,
-                    removeComments: false
-                }
-            })
-        );
+        if (pageName) {
+            entry[pageName] = entryFile;
+            htmlWebpackPlugins.push(
+                new HtmlWebpackPlugin({
+                    template: path.join(
+                        __dirname,
+                        `src/${pageName}/index.html`
+                    ),
+                    filename: `${pageName}.html`,
+                    // chunks: ["vendors", pageName],
+                    chunks: ["commons", pageName],
+                    inject: true,
+                    minify: {
+                        html5: true,
+                        collapseWhitespace: true,
+                        preserveLineBreaks: false,
+                        minifyCSS: true,
+                        minifyJS: true,
+                        removeComments: false
+                    }
+                })
+            );
+        }
+
         // console.log("pageName", match, match[1], pageName, entry);
     });
 
@@ -69,7 +76,8 @@ module.exports = {
     entry: entry,
     output: {
         path: path.join(__dirname, "dist"),
-        filename: "[name]_[chunkhash:8].js"
+        filename: "[name]-server.js",
+        libraryTarget: "umd"
     },
     module: {
         rules: [
@@ -176,8 +184,7 @@ module.exports = {
         //         }
         //     ]
         // })
-        // new webpack.optimize.ModuleConcatenationPlugin(), //当mode为production时，这个去掉
-        new FriendlyErrorsWebpackPlugin()
+        new webpack.optimize.ModuleConcatenationPlugin()
     ].concat(htmlWebpackPlugins),
     // optimization: {
     //     splitChunks: {
@@ -202,7 +209,6 @@ module.exports = {
                 }
             }
         }
-    },
+    }
     // devtool: "inline-source-map"
-    stats: "errors-only"
 };
