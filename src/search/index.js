@@ -2,7 +2,7 @@
 
 import React from "react";
 import ReactDOM from "react-dom";
-import largeNumber from "large-number";
+import largeNumber from "large-number-wfc";
 import "../../common";
 import Cat from "./images/cat.svg";
 import Fei from "./images/fei.png";

@@ -547,5 +547,15 @@
 -   webpack 打包库和组件
     引用我们写好的组件库 源码分支在 large-number 上
     ```bash
-    sudo npm i large-number-wfc -D
+    sudo npm i large-number-wfc@1.0.4 -D
     ```
+-   SSR 代码实现思路
+
+    -   服务端
+
+        -   使用 `react-dom/server` 的 `renderToString` 方法将 React 组件渲染成字符串
+        -   服务端路由返回对应的模版
+
+    -   客户端
+
+        打包出针对服务端的组件
