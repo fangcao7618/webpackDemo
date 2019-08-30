@@ -1,34 +1,43 @@
--   安装 编译解析 ES6
+## 分支
+
+-   master 最开始的主干，多页面配置
+-   large-number webpack 构建包和组件上传到 npm
+-   ssr_branch SSR 功能，有利于 SEO，请求减少
+-   webpack-gongnengsheji
+
+*   webpack_advanced_one 进阶
+
+*   安装 编译解析 ES6
 
     -   1.`npm i @babel/core @babel/preset-env babel-loader -D`
     -   2.建立.babelrc
 
--   解析 React JSX
+*   解析 React JSX
     -   1. `npm i react react-dom @babel/preset-react -D`
     -   2.  建立 src/search.js 写入 react
--   解析 CSS
+*   解析 CSS
     -   1. `npm i style-loader css-loader -D`
     -   2. css-loader 用于加载.css 文件，并且转换成 commonjs 对象;style-loader 将样式通过`<style>`标签插入到 head 中
--   解析 Less 和 Sass
+*   解析 Less 和 Sass
     -   1.less-loader 用于将 less 转换成 css `npm i less less-loader -D`
     -   2.sass-loader 用于将 sass 转换成 css
--   解析图片
+*   解析图片
     -   1.`npm i file-loader -D`
--   解析字体
+*   解析字体
     -   1.`npm i file-loader -D`
--   资源解析
+*   资源解析
 
     -   `npm i url-loader -D`
     -   也可以处理图片和字体
     -   可以设置较小资源自动 base64
 
--   webpack 中文件监听 两种方法
+*   webpack 中文件监听 两种方法
 
     -   启动 webpack 命令时，带上--watch 参数
     -   在配置 webpack.config.js 中设置 watch:true
         ![vv](./document/1566871511772.jpg)
 
--   webpack 中的热更新及原理
+*   webpack 中的热更新及原理
 
     -   热更新【方法一】：webpack-dev-server WDS `npm i webpack webpack-cli webpack-dev-server -D`
         -   WDS 不刷新浏览器
@@ -39,12 +48,12 @@
         -   适用于灵活的定制场景
             ![](./document/1566875197901.jpg)
 
--   热更新的原理分析
+*   热更新的原理分析
     ![](./document/1566875272555.jpg)
 
--   将 css 打包成单独的文件 `npm i mini-css-extract-plugin -D`
+*   将 css 打包成单独的文件 `npm i mini-css-extract-plugin -D`
 
--   文件指纹
+*   文件指纹
 
     -   打包后输出的文件名的后缀
         ![](./document/1566875555615.jpg)
@@ -60,7 +69,7 @@
         设置 file-loader 的 name,使用[hash]
         ![](./document/1566876020798.jpg)
 
--   代码压缩
+*   代码压缩
     -   HTML 压缩 `npm i html-webpack-plugin -D`
         ![](./document/1566885512562.jpg)
     -   CSS 压缩 `npm i optimize-css-assets-webpack-plugin -D`压缩 css `npm i cssnano -D`css 预处理器
