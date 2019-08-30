@@ -771,6 +771,10 @@
                 通过 webpack-merge 组合配置
 
                 ```javascript
+                //合并配置：
+                const merge=require('webpack-merge');
+                ......
+                module.exports=merge(baseConfig,devConfig);
                 ```
 
         -   将构建配置设计成一个库，比如：hjx-webpack、Neutrino、webpack-blocks
