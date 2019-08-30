@@ -545,3 +545,7 @@
         ```
 
 -   webpack 打包库和组件
+    引用我们写好的组件库 源码分支在 large-number 上
+    ```bash
+    sudo npm i large-number-wfc -D
+    ```

@@ -149,7 +149,7 @@ module.exports = {
             }
         ]
     },
-    mode: "none", //production
+    mode: "production", //production
     plugins: [
         new MiniCssExtractPlugin({
             filename: "[name]_[contenthash:8].css"
