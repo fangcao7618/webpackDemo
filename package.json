@@ -1,6 +1,6 @@
 {
     "name": "large-number-wfc",
-    "version": "1.0.2",
+    "version": "1.0.4",
     "description": "【webpack 打包库和组件】大整数加法打包",
     "main": "index.js",
     "scripts": {
