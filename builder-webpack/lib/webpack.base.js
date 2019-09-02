@@ -1,10 +1,75 @@
-// 资源解析
 /**
- *  1.解析ES6
- *  2.解析React
- *  3.
+ * 基础配置：WEBPACK.BASE.JS
+ */
+// 三、目录清理
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+//生成多个html页面的插件
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const path = require("path");
+const glob = require("glob");
+// 命令行显示信息优化插件
+const FriendlyErrorsWebpackPlugin = require("friendly-errors-webpack-plugin");
+// CSS提取成一个单独的文件插件
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+/**
+ *  四、多页面打包
+ * 动态的获取entry
+ */
+const setMPA = () => {
+    const entry = {};
+    const htmlWebpackPlugins = [];
+
+    const entryFiles = glob.sync(path.join(__dirname, "./src/*/index.js"));
+    Object.keys(entryFiles).map(index => {
+        const entryFile = entryFiles[index];
+        //'/Users/fangcao/Documents/study/study_webpack/src/index/index.js'
+        const match = entryFile.match(/src\/(.*)\/index\.js/);
+
+        const pageName = match && match[1];
+        entry[pageName] = entryFile;
+
+        htmlWebpackPlugins.push(
+            new HtmlWebpackPlugin({
+                template: path.join(__dirname, `src/${pageName}/index.html`),
+                filename: `${pageName}.html`,
+                // chunks: ["vendors", pageName],
+                chunks: ["commons", pageName],
+                inject: true,
+                minify: {
+                    html5: true,
+                    collapseWhitespace: true,
+                    preserveLineBreaks: false,
+                    minifyCSS: true,
+                    minifyJS: true,
+                    removeComments: false
+                }
+            })
+        );
+        // console.log("pageName", match, match[1], pageName, entry);
+    });
+    // console.log("entryFiles", entryFiles);
+    return {
+        entry,
+        htmlWebpackPlugins
+    };
+};
+const { entry, htmlWebpackPlugins } = setMPA();
+// 一、资源解析
+/**
+ *  1.解析 ES6
+ *  2.解析 React
+ *  3.解析 CSS
+ *  4.解析 Less
+ *  5.解析图片
+ *  6.解析字体
+ */
+// 二、样式增强
+/**
+ *  CSS前缀补齐
+ *  CSS px 转化成 rem
  */
 module.exports = {
+    entry: entry,
     module: {
         rules: [
             {
@@ -83,5 +148,28 @@ module.exports = {
                 ]
             }
         ]
-    }
+    },
+    plugins: [
+        // 七、CSS提取成一个单独的文件
+        new MiniCssExtractPlugin({
+            filename: "[name]_[contenthash:8].css"
+        }),
+        new CleanWebpackPlugin(),
+        // 五、命令行显示信息优化
+        new FriendlyErrorsWebpackPlugin(),
+        // 六、错误捕获和处理
+        function() {
+            this.hooks.done.tap("done", stats => {
+                if (
+                    stats.compilation.errors &&
+                    stats.compilation.errors.length &&
+                    process.argv.indexOf("--watch") == -1
+                ) {
+                    console.log("build error");
+                    process.exit(1);
+                }
+            });
+        }
+    ].concat(htmlWebpackPlugins),
+    stats: "errors-only"
 };
