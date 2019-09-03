@@ -16,7 +16,6 @@ class Search extends React.Component {
         };
     }
     loadComponent() {
-        console.log("ggggggggggg");
         import("./text.js.js").then(Text => {
             console.log(Text);
             this.setState({

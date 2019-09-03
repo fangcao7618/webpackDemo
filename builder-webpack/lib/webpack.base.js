@@ -3,14 +3,18 @@
  */
 // 三、目录清理
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-//生成多个html页面的插件
+// 生成多个html页面的插件
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const path = require("path");
 const glob = require("glob");
+const path = require("path");
+const autoprefixer = require("autoprefixer");
 // 命令行显示信息优化插件
 const FriendlyErrorsWebpackPlugin = require("friendly-errors-webpack-plugin");
 // CSS提取成一个单独的文件插件
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+
+const projectRoot = process.cwd(); // 获取当前目录
+
 /**
  *  四、多页面打包
  * 动态的获取entry
@@ -19,18 +23,19 @@ const setMPA = () => {
     const entry = {};
     const htmlWebpackPlugins = [];
 
-    const entryFiles = glob.sync(path.join(__dirname, "./src/*/index.js"));
+    // const entryFiles = glob.sync(path.join(__dirname, './src/*/index.js'));
+    const entryFiles = glob.sync(path.join(projectRoot, "./src/*/index.js"));
     Object.keys(entryFiles).map(index => {
         const entryFile = entryFiles[index];
-        //'/Users/fangcao/Documents/study/study_webpack/src/index/index.js'
+        // '/Users/fangcao/Documents/study/study_webpack/src/index/index.js'
         const match = entryFile.match(/src\/(.*)\/index\.js/);
 
         const pageName = match && match[1];
         entry[pageName] = entryFile;
 
-        htmlWebpackPlugins.push(
+        return htmlWebpackPlugins.push(
             new HtmlWebpackPlugin({
-                template: path.join(__dirname, `src/${pageName}/index.html`),
+                template: path.join(projectRoot, `src/${pageName}/index.html`),
                 filename: `${pageName}.html`,
                 // chunks: ["vendors", pageName],
                 chunks: ["commons", pageName],
@@ -70,6 +75,10 @@ const { entry, htmlWebpackPlugins } = setMPA();
  */
 module.exports = {
     entry: entry,
+    output: {
+        path: path.join(projectRoot, "dist"),
+        filename: "[name]_[chunkhash:8].js"
+    },
     module: {
         rules: [
             {
@@ -90,7 +99,7 @@ module.exports = {
                         loader: "postcss-loader",
                         options: {
                             plugins: () => [
-                                require("autoprefixer")({
+                                autoprefixer({
                                     overrideBrowserslist: [
                                         "last 2 version",
                                         ">1%",
@@ -107,8 +116,8 @@ module.exports = {
                     {
                         loader: "px2rem-loader",
                         options: {
-                            remUnit: 75, //75:750px的视觉稿
-                            remPrecision: 8 //px转换成rem的小数点的位数 .26666667rem
+                            remUnit: 75, // 75:750px的视觉稿
+                            remPrecision: 8 // px转换成rem的小数点的位数 .26666667rem
                         }
                     }
                 ]
@@ -158,14 +167,14 @@ module.exports = {
         // 五、命令行显示信息优化
         new FriendlyErrorsWebpackPlugin(),
         // 六、错误捕获和处理
-        function() {
+        function errorPlugin() {
             this.hooks.done.tap("done", stats => {
                 if (
                     stats.compilation.errors &&
                     stats.compilation.errors.length &&
-                    process.argv.indexOf("--watch") == -1
+                    process.argv.indexOf("--watch") === -1
                 ) {
-                    console.log("build error");
+                    console.log("构建失败：", stats.compilation.errors); // eslint-disable-line
                     process.exit(1);
                 }
             });

@@ -22,7 +22,7 @@ class Search extends React.Component {
         };
     }
     loadComponent() {
-        import("./text.js.js").then(Text => {
+        import("./text.js").then(Text => {
             this.setState({
                 Text: Text.default
             });
