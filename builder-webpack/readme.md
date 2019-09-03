@@ -105,3 +105,66 @@ npm riun test
 ## 持续集成和 TravisCI
 
 ![](./document/1567474973608.jpg)
+
+## Git 规范和 Changelog 生成
+
+提交格式：
+
+```javascript
+<type>(<scope>):<subject>
+<BLANK LINE>
+<body>
+<BLANK LINE>
+<footer>
+```
+
+对格式的说明如下：
+
+-   type 代表某次提交的类型，比如是修复一个 bug 还是增加一个新的 feature。所有的 type 类型如下：
+-   feat: 新增 feature
+-   fix: 修复 bug
+-   docs:仅仅修改了文档，比如 README，CHANGELOG，CONTRIBUTE 等等
+-   style:仅仅修改了空格、格式缩进、都好等等，不改变代码逻辑
+-   refactor：代码重构，没有加新功能或者修复 bug
+-   perf:优化相关，比如提升性能、体验
+-   test:测试用例，包括单元测试、集成测试等
+-   chore:改变构建流程、或者增加依赖库、工具等
+-   revert：回滚到上一个版本
+
+本地开发阶段增加 precommit 钩子
+
+安装 husky
+
+`npm install husky --save-dev`
+
+通过 commitmsg 钩子校验信息
+
+```javascript
+"scripts":{
+    "commitmsg":"validate-commit-msg",
+    "changelog":"conventional-changelog -p angular -i CHANGELOG.md -s -r 0"
+}
+"devDependencies":{
+    "validate-commit-msg":"",
+    "conventional-changelog-cli":"",
+    "husky":""
+}
+```
+
+## 开源版本信息
+
+软件版本通常是由三位组成，形如：X.Y.Z
+
+版本严格递增的，在发布重要版本是，可以发布 alpha,rc 等`先行版本` `16.0.0-beta.5、16.0.0-rc.2`
+
+语义化版本（Semantic Versioning）规范格式
+
+主版本号：当你做了不兼容的 API 修改，
+次版本号：当你做了向下兼容的功能性新增
+修订号：当你做了向下兼容的问题修正
+
+`先行版本号`
+alpha:内部测试版本，一般不向外发布，会有很多 BUG
+beta:也是测试版本，这个阶段会一直加入新功能，在 alpha 之后推出
+rc： Release Candidate 系统平台上就是发型候选版本。 RC 版本不会加入新功能，主要着重于除错
+
