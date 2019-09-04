@@ -1,5 +1,6 @@
 "use strict";
 
+import "babel-polyfill";
 import React from "react";
 import ReactDOM from "react-dom";
 import largeNumber from "large-number-wfc";
@@ -9,10 +10,6 @@ import Fei from "./images/fei.png";
 import Svgg from "./images/svgg.svg";
 import { a } from "./tree-shaking";
 import "./search.less";
-
-if (false) {
-    a();
-}
 
 class Search extends React.Component {
     constructor() {

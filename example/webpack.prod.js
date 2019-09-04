@@ -1,17 +1,19 @@
 "use strict";
 
+// const HappyPack = require("happypack");
 const glob = require("glob");
-
 const path = require("path");
-
 const webpack = require("webpack");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin"); //CSS提取成一个单独的文件插件
+const OptimizeCssAssetsWebpackPlugin = require("optimize-css-assets-webpack-plugin"); //代码压缩
+const HtmlWebpackPlugin = require("html-webpack-plugin"); //生成html页面
+const { CleanWebpackPlugin } = require("clean-webpack-plugin"); //清理目录
+const HtmlWebpackExternalsPlugin = require("html-webpack-externals-plugin"); //打包公共的单独文件
+const FriendlyErrorsWebpackPlugin = require("friendly-errors-webpack-plugin"); // 显示友好报错信息
+const SpeedMeasureWebpackPlugin = require("speed-measure-webpack-plugin"); //速度分析  可以看到每个 loader 的插件执行耗时
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const OptimizeCssAssetsWebpackPlugin = require("optimize-css-assets-webpack-plugin");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const HtmlWebpackExternalsPlugin = require("html-webpack-externals-plugin");
-const FriendlyErrorsWebpackPlugin = require("friendly-errors-webpack-plugin");
+const smp = new SpeedMeasureWebpackPlugin();
 
 /**
  * 动态的获取entry
@@ -29,7 +31,7 @@ const setMPA = () => {
         const pageName = match && match[1];
         entry[pageName] = entryFile;
 
-        htmlWebpackPlugins.push(
+        return htmlWebpackPlugins.push(
             new HtmlWebpackPlugin({
                 template: path.join(__dirname, `src/${pageName}/index.html`),
                 filename: `${pageName}.html`,
@@ -59,6 +61,7 @@ const setMPA = () => {
 
 const { entry, htmlWebpackPlugins } = setMPA();
 
+// module.exports = smp.wrap({
 module.exports = {
     watch: true,
     watchOptions: {
@@ -75,7 +78,17 @@ module.exports = {
         rules: [
             {
                 test: /.js$/,
-                use: ["babel-loader", "eslint-loader"]
+                use: [
+                    {
+                        loader: "thread-loader",
+                        options: {
+                            workers: 3 //采用3个worker进程
+                        }
+                    },
+                    "babel-loader"
+                    // "happypack/loader"
+                    // "eslint-loader"
+                ]
             },
             {
                 test: /.css$/,
@@ -175,10 +188,10 @@ module.exports = {
         //             global: "ReactDOM"
         //         }
         //     ]
-        // })
+        // }),
         // new webpack.optimize.ModuleConcatenationPlugin(), //当mode为production时，这个去掉
         new FriendlyErrorsWebpackPlugin(),
-        function() {
+        function errorPlugin() {
             this.hooks.done.tap("done", stats => {
                 if (
                     stats.compilation.errors &&
@@ -190,6 +203,10 @@ module.exports = {
                 }
             });
         }
+        // new BundleAnalyzerPlugin(),
+        // new HappyPack({
+        //     loaders: ["babel-loader"]
+        // })
     ].concat(htmlWebpackPlugins),
     // optimization: {
     //     splitChunks: {
@@ -201,7 +218,7 @@ module.exports = {
     //             }
     //         }
     //     }
-    // }
+    // },
     optimization: {
         splitChunks: {
             minSize: 0,
@@ -214,7 +231,8 @@ module.exports = {
                 }
             }
         }
-    },
+    }
     // devtool: "inline-source-map"
-    stats: "errors-only"
+    // stats: "errors-only" //只显示错误信息
+    // });
 };

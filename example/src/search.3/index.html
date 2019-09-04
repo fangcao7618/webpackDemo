@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        ${require('raw-loader!./meta.html')}
+        <title>Document</title>
+        <script type="text/javascript">
+            ${require('raw-loader!babel-loader!../../node_modules/lib-flexible/flexible.js')}
+        </script>
+    </head>
+    <body>
+        <div id="root"><!--HTML_PLACEHOLDER--></div>
+
+        <!-- <script
+            crossorigin
+            src="https://unpkg.com/react@16.9.0/umd/react.production.min.js"
+        ></script>
+        <script
+            crossorigin
+            src="https://unpkg.com/react-dom@16.9.0/umd/react-dom.production.min.js"
+        ></script> -->
+        <!--INITIAL_DATA_PLACEHOLDER-->
+    </body>
+</html>

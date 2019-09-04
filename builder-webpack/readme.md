@@ -167,4 +167,3 @@ npm riun test
 alpha:内部测试版本，一般不向外发布，会有很多 BUG
 beta:也是测试版本，这个阶段会一直加入新功能，在 alpha 之后推出
 rc： Release Candidate 系统平台上就是发型候选版本。 RC 版本不会加入新功能，主要着重于除错
-
