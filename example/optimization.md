@@ -248,3 +248,272 @@ module: {
     ];
 }
 ```
+
+## 多进程/多实例 ： 并行压缩
+
+-   方法一：使用 `parallel-uglify-plugin` 插件
+
+```javascript
+```
+
+-   方法二：使用 `uglifyjs-webpack-plugin` 插件(只压缩 ES6)
+
+```javascript
+```
+
+-   方法三：使用 `terser-webpack-plugin` 开启 parallel 参数
+
+```javascript
+const TerserWebapckPlugin = require("terser-webpack-plugin"); //并行压缩
+module.exports = {
+    optimization: {
+        minimizer: [
+            new TerserWebapckPlugin({
+                parallel: true
+            })
+        ]
+    }
+};
+```
+
+## 分包：设置 Externals
+
+思路：将 react、react-dom 基础包通过 cdn 引入，不打入 bundle 中
+
+方法：使用 html-webpack-externals-plugin
+
+## 进一步分包：预编译资源模块
+
+思路：将`react`、`react-dom`、`redux`、`react-redux`基础包和业务基础包打包成一个文件
+
+方法：使用 DLLPlugin 进行分包，`DllReferencePlugin` 对 `manifest.json` 引用
+
+### `使用 DLLPlugin 进行分包`
+
+![](./documents/1567566973951.jpg)
+
+```javascript
+```
+
+### `使用 DllReferencePlugin 引用 manifest.json`
+
+1.新建`webpack.dll.js`
+
+```javascript
+// webpack.dll.js
+const path = require("path");
+const webpack = require("webpack");
+module.exports = {
+    entry: {
+        library: ["react", "react-dom"]
+    },
+    output: {
+        filename: "[name]_[chunkhash].dll.js",
+        path: path.join(__dirname, "build/library"),
+        library: "[name]"
+    },
+    plugins: [
+        new webpack.DllPlugin({
+            name: "[name]_[hash]",
+            path: path.join(__dirname, "build/library/[name].json")
+        })
+    ]
+};
+```
+
+运行 `yarn dll` 即（`"dll": "webpack --config webpack.dll.js"`）
+
+2.然后在`webpack.prod.js`引用`webpack.dll.js`
+
+```javascript
+new webpack.DllReferencePlugin({
+    manifest: require("./build/library/library.manifest.json")
+});
+```
+
+## 缓存
+
+-   目的：提升二次构建速度
+
+-   缓存思路：
+
+    -   babel-loader 开启缓存
+
+    ```javascript
+    loaders: ["babel-loader?cacheDirectory=true"];
+    ```
+
+    -   terser-webpack-plugin（代码压缩） 开启缓存
+
+    ```javascript
+    new TerserWebapckPlugin({
+        parallel: true,
+        cache: true
+    });
+    ```
+
+    -   使用 cache-loader 或者 hard-source-webpack-plugin
+
+    ```javascript
+    `npm i hard-source-webpack-plugin -D`;
+    const HardSourceWebpackPlugin = require("hard-source-webpack-plugin"); //缓存插件
+    new HardSourceWebpackPlugin();
+    ```
+
+## 缩小构建目标
+
+-   目的：尽可能的少构建模块
+-   思路：
+
+    -   比如 babel-loader 不解析 node_modules
+
+    ```javascript
+    module.exports = {
+        module: {
+            rules: {
+                test: /\.js$/,
+                exclude: "node_modules",
+                loader: "happypack/loader"
+            }
+        }
+    };
+    ```
+
+    -   减少文件搜索范围
+
+        -   优化 resolve.modules 配置（减少模块搜索层级）
+        -   优化 resolve.mainFields 配置
+        -   优化 resolve.extensions 配置
+        -   合理使用 `alias`(指定特定的查找)
+
+        ```javascript
+        module.exports = {
+            module: {
+                rules: {
+                    test: /\.js$/,
+                    include: path.resolve("src"),
+                    loader: "happypack/loader"
+                }
+            },
+            resolve: {
+                alias: {
+                    react: path.resolve(
+                        __dirname,
+                        "./node_modules/react/umd/react.production.min.js"
+                    ),
+                    "react-dom": path.resolve(
+                        __dirname,
+                        "./node_modules/react-dom/umd/react-dom.production.min.js"
+                    )
+                },
+                extensions: [".js", ".json"],
+                mainFields: ["loader", "main"]
+            }
+        };
+        ```
+
+## 没用到的 CSS 擦除掉
+
+`npm i purgecss-webpack-plugin -D`
+
+```javascript
+const PurgecssPlugin = require("purgecss-webpack-plugin"); //擦除无用的css
+const PATHS = {
+    src: path.join(__dirname, "src")
+};
+module.exports = {
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: "[name]_[contenthash:8].css"
+        }),
+        new PurgecssPlugin({
+            paths: glob.sync(`${PATHS.src}/**/*`, { nodir: true })
+        })
+    ]
+};
+```
+
+## 使用 webpack 进行图片压缩
+
+-   要求：基于 Node 库的 imagemin 或者 tinypng API
+-   使用：配置 [image-webpack-loader](https://github.com/tcoopman/image-webpack-loader)
+
+```bash
+npm install image-webpack-loader --save-dev or npm i image-webpack-loader -D
+```
+
+```javascript
+const PurgecssPlugin = require("purgecss-webpack-plugin"); //擦除无用的css
+const PATHS = {
+    src: path.join(__dirname, "src")
+};
+module.exports = {
+    module: {
+        rules: [
+            {
+                test: /.(png|jpg|gif|jpeg|svg)$/,
+                use: [
+                    {
+                        loader: "file-loader",
+                        options: {
+                            name: "[name]_[hash:8].[ext]"
+                        }
+                    },
+                    {
+                        loader: "image-webpack-loader",
+                        options: {
+                            mozjpeg: {
+                                progressive: true,
+                                quality: 65
+                            },
+                            // optipng.enabled: false will disable optipng
+                            optipng: {
+                                enabled: false
+                            },
+                            pngquant: {
+                                quality: [0.65, 0.9],
+                                speed: 4
+                            },
+                            gifsicle: {
+                                interlaced: false
+                            },
+                            // the webp option will enable WEBP
+                            webp: {
+                                quality: 75
+                            }
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: "[name]_[contenthash:8].css"
+        }),
+        new PurgecssPlugin({
+            paths: glob.sync(`${PATHS.src}/**/*`, { nodir: true })
+        })
+    ]
+};
+```
+
+## 构建体积优化：动态 `[Polyfill](https://polyfill.io/v3/polyfill.min.js)`
+
+### Polyfill Service 原理
+
+识别 `User Agent`,下发不同的 `Polyfill`
+
+### 如何使用动态 Polyfill service
+
+# 体积优化策略总结
+
+-   Scope Hoisting
+
+-   Tree-shaking
+
+-   公共资源分离
+
+-   图片压缩
+
+-   动态 Polyfill

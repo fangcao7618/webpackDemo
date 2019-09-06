@@ -8,6 +8,7 @@ import "../../common";
 import Cat from "./images/cat.svg";
 import Fei from "./images/fei.png";
 import Svgg from "./images/svgg.svg";
+import Bg from "./images/bg.jpg";
 import { a } from "./tree-shaking";
 import "./search.less";
 
@@ -31,6 +32,7 @@ class Search extends React.Component {
         const addResult = largeNumber("999", "1");
         return (
             <React.Fragment>
+                <img src={Bg} alt=""></img>
                 <div className="search-text">
                     {funcA}
                     <br></br>搜索文字的内容:WFC,汉体书写 九<br></br>
