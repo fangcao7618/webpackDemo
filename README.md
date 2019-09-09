@@ -2,6 +2,20 @@
 
 [example](./example/readme.md) 没有划分功能的大杂烩（最基础的）
 
+[loader-order](./loader-order/README.md) loader 被加载的顺序
+
+[my-plugin] 编写 webpack 插件
+
+[raw-loader](./raw-loader/README.md)loader 开发
+
+[sprite-loader-source](./sprite-loader-source) 雪碧 loader 开发
+
+[tapable-test](./tapable-test/README.md) 看 webpack 源码解析
+
+[webpack-simple-source](./webpack-simple-source/README.md) 一个简易的 webpack
+
+[zip-plugin](./zip-plugin/README.md) 打包压缩包 zip
+
 # webpack 启动过程分析
 
 ## webpack 最终找到 webpack-cli(webpack-command) 这个 npm 包，并且执行 CLI

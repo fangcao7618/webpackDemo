@@ -26,6 +26,4 @@ module.exports = function(source) {
     // return `export default ${json}`;
     // this.callback(new Error("Error"), json);
     // this.callback(null, json, 2, 3, 4, 5); //返回多个值
-
-    
 };

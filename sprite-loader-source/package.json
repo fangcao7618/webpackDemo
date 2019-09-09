@@ -1,0 +1,11 @@
+{
+  "name": "sprite-loader-source",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {
+    "loader-runner": "^3.0.0",
+    "spritesmith": "^3.3.1"
+  }
+}
