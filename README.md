@@ -12,6 +12,8 @@
 
 [tapable-test](./tapable-test/README.md) 看 webpack 源码解析
 
+[testProject](./testProject/README.md) 单元测试
+
 [webpack-simple-source](./webpack-simple-source/README.md) 一个简易的 webpack
 
 [zip-plugin](./zip-plugin/README.md) 打包压缩包 zip

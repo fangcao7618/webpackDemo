@@ -1,0 +1,26 @@
+{
+    "name": "react-redux-project",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "webpack --config webpack.prod.js",
+        "dev": "webpack-dev-server --config webpack.dev.js --open"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "react": "^16.9.0",
+        "react-dom": "^16.9.0",
+        "react-redux": "^7.1.1",
+        "redux": "^4.0.4"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.6.0",
+        "@babel/preset-react": "^7.0.0",
+        "builder-webpack-geektime": "^1.0.1",
+        "webpack-dev-server": "^3.8.0"
+    }
+}
